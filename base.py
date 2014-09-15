@@ -1,57 +1,20 @@
 from settings import *
 from printer import WithoutColorPrinter, AnsiColorPrinter
 
-
-class ChessPiece:
-    color       = None
-    pos         = False
-    moved       = False
-    ucOffset    = None
-    ascii       = None
-
-    def __init__(self, color):
-        self.color = color
-
-    def move(self, target):
-        pass
-
-    def getPossibleMoves(self):
-        pass
-
-
-class King(ChessPiece):
-    ucOffset    = 0
-    ascii       = 'K'
-
-class Queen(ChessPiece):
-    ucOffset    = 1
-    ascii       = 'Q'
-
-class Rook(ChessPiece):
-    ucOffset    = 2
-    ascii       = 'R'
-    moveTypes   = []
-
-class Bishop(ChessPiece):
-    ucOffset    = 3
-    ascii       = 'B'
-
-class Knight(ChessPiece):
-    ucOffset    = 4
-    ascii       = 'N'
-
-class Pawn(ChessPiece):
-    ucOffset    = 5
-    ascii       = 'P'    
-
-
+#######################################################
+### Movements
+#######################################################
 
 class Movements:
     pos =  None
     color = None
-    def __init__(self, pos, color = None):
-        self.pos = Board.tI(pos)
+    piece = None
+
+    def __init__(self, pos = None, color = None, piece = None):
+        if pos is not None:
+            self.pos = Board.tI(pos)
         self.color = color
+        self.piece = piece
 
     def getSpec(self):
         rStr = "Position: " + Board.tN(self.pos)
@@ -103,8 +66,6 @@ class RookMovements(Movements):
         moveGroups.append(moves)
 
         return moveGroups
-          
-
 
 class BishopMovements(Movements):
     def getPossibleMoves(self):
@@ -137,7 +98,6 @@ class BishopMovements(Movements):
 
         return moveGroups
 
-
 class PawnMovements(Movements):
     def getPossibleMoves(self):
         i, j = self.pos
@@ -166,7 +126,7 @@ class KnightMovements(Movements):
                 iii, jjj = jump[::dir]
                 ii = i + jjj
                 jj = j + iii
-                if not ( ii == i and jj == j) and ii >= 0 and ii <= 8 and jj >= 0 and jj <= 8:
+                if not ( ii == i and jj == j) and ii >= 0 and ii <= 7 and jj >= 0 and jj <= 7:
                     moves.append((ii, jj))
 
         return [moves]
@@ -177,12 +137,88 @@ class KingMovements(Movements):
         i, j = self.pos
         moves = []
         for ii in range(i - 1, i + 2):
-            for jj in range(i - 1, i + 2):
-                if ii >= 0 and ii <= 8 and jj >= 0 and jj <= 8:
+            for jj in range(j - 1, j + 2):
+                if not (ii == i and jj == j) and  ii >= 0 and ii <= 7 and jj >= 0 and jj <= 7:
                     moves.append((ii, jj))
 
         return [moves] 
 
+#######################################################
+
+
+#######################################################
+### Chess Pieces
+#######################################################
+
+class ChessPiece:
+    color       = None
+    pos         = False
+    moved       = False
+    ucOffset    = None
+    ascii       = None
+    moveClasses = []
+    moveIns   = []
+
+    def __init__(self, color):
+        self.color      = color
+
+        for c in self.moveClasses:
+            self.moveIns.append(c(piece = self))
+
+    def move(self, target):
+        pass
+
+    def getPossibleMoves(self):
+        pass
+
+    def __str__(self):
+        rStr = "-" + self.__class__.__name__ + "\n"
+        rStr += "  Position: " + Board.tN(self.pos) + ", Color: " + self.color + "\n"
+        rStr += "  Possible Moves: " + str(self.getPossibleMoves())
+        # rStr += " Possible Moves: " + "\n";
+        # for group in self.getPossibleMoves():
+        #     rStr += "   - "
+        #     for move in group:
+        #         rStr += Board.tN(move) + " "
+        #     rStr += "\n"
+        return rStr
+
+class King(ChessPiece):
+    ucOffset    = 0
+    ascii       = 'K'
+    moveClasses = [KingMovements]
+
+class Queen(ChessPiece):
+    ucOffset    = 1
+    ascii       = 'Q'
+    moveClasses = [RookMovements, BishopMovements]
+
+class Rook(ChessPiece):
+    ucOffset    = 2
+    ascii       = 'R'
+    moveClasses = [RookMovements]
+
+class Bishop(ChessPiece):
+    ucOffset    = 3
+    ascii       = 'B'
+    moveClasses = [BishopMovements]
+
+class Knight(ChessPiece):
+    ucOffset    = 4
+    ascii       = 'N'
+    moveClasses = [KnightMovements]
+
+class Pawn(ChessPiece):
+    ucOffset    = 5
+    ascii       = 'P'
+    moveClasses = [PawnMovements]
+
+#######################################################
+
+
+#######################################################
+### Board
+#######################################################
 
 class Board:
     b = [[None for x in range(8)] for y in range(8)]
@@ -254,3 +290,4 @@ class Board:
         rStr += self.printer.outputColLabels() + "\n"
         return rStr
 
+#######################################################

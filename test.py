@@ -13,16 +13,16 @@ class Player:
 r = RookMovements('C4')
 print(r)
 
-r = KingMovements('C4')
+r = KingMovements('H7')
 print(r)
 
-r = KnightMovements('C4')
+r = KnightMovements('H7')
 print(r)
 
-print(BishopMovements('C4'))
+# print(BishopMovements('C4'))
 
-print(PawnMovements('C2', C.W))
-print(PawnMovements('C2', C.B))
+#print(PawnMovements('C2', C.W))
+#print(PawnMovements('C2', C.B))
 
 b = Board()
 
@@ -40,3 +40,12 @@ print(b['A1'])
 print(b)
 
 print(Board.tI('A1'))
+
+
+while True:
+	kIn = input("\nInput: \n")
+	if len(kIn) == 0:
+		break
+	if len(kIn) == 2:
+		print(b[kIn])
+			
