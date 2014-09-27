@@ -16,19 +16,27 @@ class Movements:
         self.color = color
         self.piece = piece
 
+    def getPos(self):
+        if self.piece is not None:
+            return self.piece.getPos()
+        return self.pos
+
+    def getColor(self):
+        if self.piece is not None:
+            return self.piece.getColor()
+        return self.color
+
     def getSpec(self):
-        rStr = "Position: " + Board.tN(self.pos)
+        rStr = "Position: " + Board.tN(self.getPos())
         if self.color != None:
-            rStr += ", Color: " + self.color
+            rStr += ", Color: " + self.getColor()
         return rStr
 
-    def getPossibleMoves(self, position, board):
+    def getPossibleMoves(self):
         pass
 
     def __str__(self):
-        rStr = self.__class__.__name__ + "\n";
-        rStr += " " + self.getSpec() + "\n";
-        rStr += " Possible Moves: " + "\n";
+        rStr = self.__class__.__name__ + " | " + self.getSpec() + "\n";
         for group in self.getPossibleMoves():
             rStr += "   - "
             for move in group:
@@ -36,9 +44,10 @@ class Movements:
             rStr += "\n"
         return rStr
 
+
 class RookMovements(Movements):
     def getPossibleMoves(self):
-        i, j = self.pos
+        i, j = self.getPos()
         moveGroups = []
 
         # UP
@@ -67,9 +76,10 @@ class RookMovements(Movements):
 
         return moveGroups
 
+
 class BishopMovements(Movements):
     def getPossibleMoves(self):
-        i, j = self.pos
+        i, j = self.getPos()
         moveGroups = []
 
         # RIGHT UP
@@ -98,15 +108,16 @@ class BishopMovements(Movements):
 
         return moveGroups
 
+
 class PawnMovements(Movements):
     def getPossibleMoves(self):
-        i, j = self.pos
-        if self.color is None:
+        i, j = self.getPos()
+        if self.getColor() is None:
             raise Exception("Pawn Movements need a color")
 
         start = 1
         direction = 1
-        if self.color == C.B:
+        if self.getColor() == C.B:
             start = 6
             direction = -1
 
@@ -117,9 +128,10 @@ class PawnMovements(Movements):
 
         return [moves]
 
+
 class KnightMovements(Movements):
     def getPossibleMoves(self):
-        i, j = self.pos
+        i, j = self.getPos()
         moves = []
         for jump in [(2,1), (2,-1), (-2,1), (-2,-1)]:
             for dir in [1, -1]:
@@ -127,21 +139,21 @@ class KnightMovements(Movements):
                 ii = i + jjj
                 jj = j + iii
                 if not ( ii == i and jj == j) and ii >= 0 and ii <= 7 and jj >= 0 and jj <= 7:
-                    moves.append((ii, jj))
+                    moves.append([(ii, jj)])
 
-        return [moves]
+        return moves
 
 
 class KingMovements(Movements):
     def getPossibleMoves(self):
-        i, j = self.pos
+        i, j = self.getPos()
         moves = []
         for ii in range(i - 1, i + 2):
             for jj in range(j - 1, j + 2):
                 if not (ii == i and jj == j) and  ii >= 0 and ii <= 7 and jj >= 0 and jj <= 7:
-                    moves.append((ii, jj))
+                    moves.append([(ii, jj)])
 
-        return [moves] 
+        return moves
 
 #######################################################
 
@@ -157,30 +169,59 @@ class ChessPiece:
     ucOffset    = None
     ascii       = None
     moveClasses = []
-    moveIns   = []
+    moveIns     = []
+    board       = None
 
     def __init__(self, color):
         self.color      = color
-
+        self.moveIns    = []
         for c in self.moveClasses:
-            self.moveIns.append(c(piece = self))
+            mI = c(piece = self)
+            print(mI.__class__.__name__)
+            self.moveIns.append(mI)
 
     def move(self, target):
         pass
 
+    def getPos(self):
+        return self.pos
+
+    def getColor(self):
+        return self.color
+
+    def getPiecePossibleMoves(self):
+        t = []
+        for ins in self.moveIns:
+            t.extend(ins.getPossibleMoves())
+        return t
+
     def getPossibleMoves(self):
-        pass
+        t = []
+        for group in self.getPiecePossibleMoves():
+            if len(group) == 0:
+                continue
+
+            for e in group:
+                #print(e, Board.tN(e), self.board[e].__class__.__name__)
+                if self.board[e] != None:
+                    break
+                t.append(e)
+        return t
 
     def __str__(self):
         rStr = "-" + self.__class__.__name__ + "\n"
         rStr += "  Position: " + Board.tN(self.pos) + ", Color: " + self.color + "\n"
-        rStr += "  Possible Moves: " + str(self.getPossibleMoves())
-        # rStr += " Possible Moves: " + "\n";
-        # for group in self.getPossibleMoves():
-        #     rStr += "   - "
-        #     for move in group:
-        #         rStr += Board.tN(move) + " "
-        #     rStr += "\n"
+        rStr += "  Possible Moves: "
+        for i, group in enumerate(self.getPossibleMoves()):
+            if isinstance(group, list):
+                if i == 0:
+                    rStr += "\n"
+                rStr += "    - "
+                for move in group:
+                    rStr += Board.tN(move) + " "
+                rStr += "\n"
+            else:
+                rStr += Board.tN(group) + " "
         return rStr
 
 class King(ChessPiece):
@@ -230,21 +271,21 @@ class Board:
             self.printer = WithoutColorPrinter
 
     def setStartPosition(self):
-        for i in range(1, 9):
-            self[(i, 2)] = Pawn(C.W)
-            self[(i, 7)] = Pawn(C.B)
+        for i in range(8):
+            self[(i, 1)] = Pawn(C.W)
+            self[(i, 6)] = Pawn(C.B)
 
-        for i in [1, 8]:
-            self[(i, 1)] = Rook(C.W)
-            self[(i, 8)] = Rook(C.B)
+        for i in [0, 7]:
+            self[(i, 0)] = Rook(C.W)
+            self[(i, 7)] = Rook(C.B)
 
-        for i in [2, 7]:
-            self[(i, 1)] = Knight(C.W)
-            self[(i, 8)] = Knight(C.B)
+        for i in [1, 6]:
+            self[(i, 0)] = Knight(C.W)
+            self[(i, 7)] = Knight(C.B)
 
-        for i in [3, 6]:
-            self[(i, 1)] = Bishop(C.W)
-            self[(i, 8)] = Bishop(C.B)
+        for i in [2, 5]:
+            self[(i, 0)] = Bishop(C.W)
+            self[(i, 7)] = Bishop(C.B)
 
         self['D1'] = King(C.W)
         self['D8'] = King(C.B)
@@ -252,22 +293,41 @@ class Board:
         self['E1'] = Queen(C.W)
         self['E8'] = Queen(C.B)
 
-
     def __getitem__(self, key):
         i = self.tI(key)
         return self.b[i[1]][i[0]] 
 
     def __setitem__(self, key, value):
         i = self.tI(key)
-        value.pos  = i
+        if value:
+            value.pos       = i
+            value.board     = self
         self.b[i[1]][i[0]] = value
+
+    def move(self, oPos, tPos):
+        o = self.tI(oPos)
+        t = self.tI(tPos)
+        
+        oP = self[o]
+        tP = self[t]
+        print("Try to move:", Board.tN(o), "->",Board.tN(t))
+
+        if oP:
+            if t in oP.getPossibleMoves():
+                self[t] = oP
+                self[o] = None
+            else:
+                print("Not possible")
+        else:
+            print("No piece at " + Board.tN(o))
+
 
     @staticmethod
     def tI(key):
         if isinstance(key, tuple):
             xL, yL = key
-            x = xL - 1
-            y = yL - 1
+            x = xL
+            y = yL
             return (x, y)
         else:
             xL, yL = key

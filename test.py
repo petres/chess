@@ -10,14 +10,14 @@ class Player:
         # return best move
         pass
 
-r = RookMovements('C4')
-print(r)
+# r = RookMovements('C4')
+# print(r)
 
-r = KingMovements('H7')
-print(r)
+# r = KingMovements('H7')
+# print(r)
 
-r = KnightMovements('H7')
-print(r)
+# r = KnightMovements('H7')
+# print(r)
 
 # print(BishopMovements('C4'))
 
@@ -27,25 +27,40 @@ print(r)
 b = Board()
 
 b.setStartPosition();
-b['E7'] = King(C.B)
-b['D7'] = King(C.W)
+
+
+# b['E7'] = King(C.B)
+# b['A3'] = Pawn(C.B)
+# b['A1'] = Bishop(C.B)
+
+# print(b['E7'])
+# print(b['A3'])
+
+# print(b['E7'].moveIns)
+# print(b['A3'].moveIns)
+
+# exit()
+
+#b['D7'] = King(C.W)
 # b['E8'] = {'p': Queen, 'c': C.B}
 # b['C4'] = {'p': Rock, 'c': C.W}
 # b['D4'] = {'p': Bishop, 'c': C.W}
 
 # b[(1, 3)] = {'p': P.P, 'c': C.W}
 
-print(b['A1'])
+#print(b['A1'])
 
-print(b)
+#print(b)
 
-print(Board.tI('A1'))
 
 
 while True:
-	kIn = input("\nInput: \n")
+	print(b)
+	kIn = input("\nInput: ")
 	if len(kIn) == 0:
 		break
 	if len(kIn) == 2:
 		print(b[kIn])
+	if len(kIn) == 4:
+		b.move(kIn[:2],kIn[2:])
 			
