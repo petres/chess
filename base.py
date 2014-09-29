@@ -181,8 +181,14 @@ class ChessPiece:
             #print(mI.__class__.__name__)
             self.moveIns.append(mI)
 
-    def move(self, target):
-        pass
+    def move(self, t):
+        if t in self.getPossibleMoves():
+            oldPos = self.pos
+            self.board[t] = self
+            self.moved = True
+            self.board[oldPos] = None
+        else:
+            print("Not possible")
 
     def getPos(self):
         return self.pos
@@ -230,21 +236,57 @@ class ChessPiece:
                 rStr += Board.tN(group) + " "
         return rStr
 
+
 class King(ChessPiece):
     ucOffset    = 0
     ascii       = 'K'
     moveClasses = [KingMovements]
 
-    def getAddMoves():
+    def move(self, t):
+        # Rochade
+        if t in self.getAddMoves():
+            oldPos = self.pos
+            self.board[t] = self
+            self.moved = True
+            self.board[oldPos] = None
+            if self.pos[0] == 1:
+                oldPos = (0, self.pos[1])
+                self.board[(2, self.pos[1])] = self.board[oldPos]
+                self.board[oldPos] = None
+            else:
+                oldPos = (7, self.pos[1])
+                self.board[(4, self.pos[1])] = self.board[oldPos]
+                self.board[oldPos] = None    
+        else:
+            super().move(t)
+
+    def getAddMoves(self):
         # Rochade
         moves = []
         for i in [0, 7]:
             if self.moved == False:
                 mP = self.board[(i, self.pos[1])]
-                if is_instance(mP, Rook) and mP.getColor() == self.getColor() and mP.moved == False:
-                    for ii in range(i, self.pos[1])):
+                if isinstance(mP, Rook) and mP.getColor() == self.getColor() and mP.moved == False:
+                    between = []
+                    if i == 0:
+                        between = range(1, 3)
+                    else:
+                        between = range(4, 7)
+                    
+                    possible = True
+                    for ii in between:
+                        if self.board[(ii, self.pos[1])] is not None:
+                            possible = False
+                            break
+                    # TODO CHECK CHECK!
+                    if possible:
+                        if i == 0:
+                            move = (1, self.pos[1])
+                        else:
+                            move = (5, self.pos[1])
+                        moves.append(move)
 
-        return []
+        return moves
 
 class Queen(ChessPiece):
     ucOffset    = 1
@@ -345,19 +387,12 @@ class Board:
         t = self.tI(tPos)
         
         oP = self[o]
-        tP = self[t]
         print("Try to move:", Board.tN(o), "->",Board.tN(t))
 
         if oP:
-            if t in oP.getPossibleMoves():
-                self[t] = oP
-                oP.moved = True
-                self[o] = None
-            else:
-                print("Not possible")
+            oP.move(t)
         else:
             print("No piece at " + Board.tN(o))
-
 
     @staticmethod
     def tI(key):
