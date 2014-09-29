@@ -35,6 +35,7 @@ class Movements:
     def getPossibleMoves(self):
         pass
 
+
     def __str__(self):
         rStr = self.__class__.__name__ + " | " + self.getSpec() + "\n";
         for group in self.getPossibleMoves():
@@ -177,7 +178,7 @@ class ChessPiece:
         self.moveIns    = []
         for c in self.moveClasses:
             mI = c(piece = self)
-            print(mI.__class__.__name__)
+            #print(mI.__class__.__name__)
             self.moveIns.append(mI)
 
     def move(self, target):
@@ -206,7 +207,12 @@ class ChessPiece:
                 if self.board[e] != None:
                     break
                 t.append(e)
+
+        t.extend(self.getAddMoves())
         return t
+
+    def getAddMoves(self):
+        return []
 
     def __str__(self):
         rStr = "-" + self.__class__.__name__ + "\n"
@@ -228,6 +234,17 @@ class King(ChessPiece):
     ucOffset    = 0
     ascii       = 'K'
     moveClasses = [KingMovements]
+
+    def getAddMoves():
+        # Rochade
+        moves = []
+        for i in [0, 7]:
+            if self.moved == False:
+                mP = self.board[(i, self.pos[1])]
+                if is_instance(mP, Rook) and mP.getColor() == self.getColor() and mP.moved == False:
+                    for ii in range(i, self.pos[1])):
+
+        return []
 
 class Queen(ChessPiece):
     ucOffset    = 1
@@ -254,6 +271,24 @@ class Pawn(ChessPiece):
     ascii       = 'P'
     moveClasses = [PawnMovements]
 
+    def getAddMoves(self):
+        moves = []
+        i, j = self.getPos()
+
+        direction = 1
+        if self.getColor() == C.B:
+            direction = -1
+
+        if i != 0 and self.board[i - 1 , j + direction] is not None and self.board[i - 1, j + direction].getColor() != self.getColor():
+            moves.append((i - 1, j + direction))
+
+        if j != 7 and self.board[i + 1 , j + direction] is not None and self.board[i + 1, j + direction].getColor() != self.getColor():
+            moves.append((i + 1, j + direction))
+
+        # en passant
+
+        return moves
+
 #######################################################
 
 
@@ -263,6 +298,7 @@ class Pawn(ChessPiece):
 
 class Board:
     b = [[None for x in range(8)] for y in range(8)]
+    pawnDoubleMove = None
     
     def __init__(self):
         if Settings.ansiColors:
@@ -315,6 +351,7 @@ class Board:
         if oP:
             if t in oP.getPossibleMoves():
                 self[t] = oP
+                oP.moved = True
                 self[o] = None
             else:
                 print("Not possible")
