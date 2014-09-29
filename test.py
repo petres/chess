@@ -63,10 +63,26 @@ b.move("b1", "a3")
 while True:
 	print(b)
 	kIn = input("\nInput: ")
+	if " " in kIn or len(kIn) == 1:
+		cmd = kIn.split(" ")
+		fileName = Settings.fileName 
+		if len(cmd) == 2:
+			fileName = cmd[1]
+
+		print(cmd[0])
+		if cmd[0] == "e":
+			print("Exporting")
+			b.writeFile(fileName)
+		elif cmd[0] == "i":
+			print("Importing")
+			b = Board.readFile(fileName)
 	if len(kIn) == 0:
 		break
 	if len(kIn) == 2:
 		print(b[kIn])
 	if len(kIn) == 4:
 		b.move(kIn[:2],kIn[2:])
+
+
+		
 			

@@ -1,6 +1,9 @@
 from settings import *
 from printer import WithoutColorPrinter, AnsiColorPrinter
 
+import os, sys
+
+os.chdir(os.path.dirname(sys.argv[0]))
 #######################################################
 ### Movements
 #######################################################
@@ -343,6 +346,8 @@ class Board:
     pawnDoubleMove = None
     
     def __init__(self):
+        self.b = [[None for x in range(8)] for y in range(8)]
+        self.pawnDoubleMove = None
         if Settings.ansiColors:
             self.printer = AnsiColorPrinter
         else:
@@ -421,5 +426,51 @@ class Board:
             rStr += self.printer.outputRowLabel(j + 1) + "\n"
         rStr += self.printer.outputColLabels() + "\n"
         return rStr
+
+    def writeFile(self, fileName = Settings.fileName):
+        strRep = ""
+        printer = WithoutColorPrinter
+        for j in range(8)[::-1]:
+            for i in range(8):
+                piece = self.b[j][i]
+                s = " "
+                if piece:
+                    s = printer.getSignForPiece(piece, False)
+                strRep += s
+            strRep += "\n"
+        
+        with open(os.path.join(Settings.posFolder, fileName), 'w') as f:
+            f.write(strRep)
+
+    @staticmethod
+    def readFile(fileName = Settings.fileName):
+        b = Board()
+        with open(os.path.join(Settings.posFolder, fileName), 'r') as f:
+            content = f.read()
+
+        asciiToPiece = {
+            "P": Pawn,
+            "R": Rook,
+            "K": King,
+            "N": Knight,
+            "B": Bishop,
+            "Q": Queen
+        }
+
+        for i in range(8):
+            for j in range(8):
+                value = content[j + i*(8+1)]
+                if value != " ":
+                    color = C.B
+                    if value.isupper():
+                        color = C.W
+                    pieceLetter = value.upper()
+
+                    b.b[7 - i][j] = asciiToPiece[pieceLetter](color)
+
+        return b
+
+
+
 
 #######################################################

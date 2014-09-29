@@ -37,8 +37,8 @@ class WithoutColorPrinter:
         return rStr
 
     @staticmethod
-    def getSignForPiece(p):
-        if Settings.utf8:
+    def getSignForPiece(p, utf8 = Settings.utf8):
+        if utf8:
             code = 0x2654
             if p.color == C.W:
                 code = 0x265A
