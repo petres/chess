@@ -190,8 +190,11 @@ class ChessPiece:
             self.board[t] = self
             self.moved = True
             self.board[oldPos] = None
+            self.board.pawnDoubleMove = None
+            return True
         else:
             print("Not possible")
+            return False
 
     def getPos(self):
         return self.pos
@@ -250,7 +253,7 @@ class King(ChessPiece):
 
     def move(self, t):
         # Rochade
-        if t in self.getAddMoves():
+        if t in self.getRochadeMoves():
             oldPos = self.pos
             self.board[t] = self
             self.moved = True
@@ -262,12 +265,13 @@ class King(ChessPiece):
             else:
                 oldPos = (7, self.pos[1])
                 self.board[(4, self.pos[1])] = self.board[oldPos]
-                self.board[oldPos] = None    
+                self.board[oldPos] = None
+            self.board.pawnDoubleMove = None
+            return True  
         else:
-            super().move(t)
+            return super().move(t)
 
-    def getAddMoves(self):
-        # Rochade
+    def getRochadeMoves(self):
         moves = []
         for i in [0, 7]:
             if self.moved == False:
@@ -291,8 +295,10 @@ class King(ChessPiece):
                         else:
                             move = (5, self.pos[1])
                         moves.append(move)
-
         return moves
+
+    def getAddMoves(self):
+        return self.getRochadeMoves()
 
 class Queen(ChessPiece):
     ucOffset    = 1
@@ -319,7 +325,26 @@ class Pawn(ChessPiece):
     ascii       = 'P'
     moveClasses = [PawnMovements]
 
-    def getAddMoves(self):
+    def move(self, t):
+        if t in self.getEnPassantMoves():
+            oldPos = self.pos
+            self.board[t] = self
+            self.moved = True
+            self.board[oldPos] = None
+            self.board[(t[0], oldPos[1])] = None
+            self.board.pawnDoubleMove = None
+            return True
+        elif abs(t[1] - self.pos[1]) == 2:
+            # Setting for possibility of en passent
+            if super().move(t):
+                self.board.pawnDoubleMove = self.pos
+                return True
+            else:
+                return False
+        else:
+            return super().move(t)
+
+    def getCaptureMoves(self):
         moves = []
         i, j = self.getPos()
 
@@ -333,9 +358,21 @@ class Pawn(ChessPiece):
         if j != 7 and self.board[i + 1 , j + direction] is not None and self.board[i + 1, j + direction].getColor() != self.getColor():
             moves.append((i + 1, j + direction))
 
-        # en passant
-
         return moves
+
+    def getEnPassantMoves(self):
+        if self.board.pawnDoubleMove is not None:
+            i, j = self.getPos()
+            if j == self.board.pawnDoubleMove[1] and abs(i - self.board.pawnDoubleMove[0]) == 1 and self.board[self.board.pawnDoubleMove].getColor() != self.getColor(): 
+                direction = 1
+                if self.getColor() == C.B:
+                    direction = -1
+                return [(self.board.pawnDoubleMove[0], self.board.pawnDoubleMove[1] + direction)]
+
+        return []
+
+    def getAddMoves(self):
+        return self.getCaptureMoves() + self.getEnPassantMoves()
 
 #######################################################
 
