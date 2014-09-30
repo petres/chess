@@ -213,7 +213,10 @@ class ChessPiece:
 
             for e in group:
                 #print(e, Board.tN(e), self.board[e].__class__.__name__)
-                if self.board[e] != None:
+                tPiece = self.board[e]
+                if tPiece != None:
+                    if tPiece.color != self.color:
+                        t.append(e)
                     break
                 t.append(e)
 
