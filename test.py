@@ -27,13 +27,13 @@ class Player:
 b = Board()
 
 b.setStartPosition();
-b.move("a2", "a4")
-b.move("b7", "b5")
-b.move("b2", "b4")
-b.move("a4", "b5")
-b.move("c2", "c4")
-b.move("c1", "b2")
-b.move("b1", "a3")
+# b.move("a2", "a4")
+# b.move("b7", "b5")
+# b.move("b2", "b4")
+# b.move("a4", "b5")
+# b.move("c2", "c4")
+# b.move("c1", "b2")
+# b.move("b1", "a3")
 
 # b['E7'] = King(C.B)
 # b['A3'] = Pawn(C.B)

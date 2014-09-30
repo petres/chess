@@ -7,6 +7,7 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 #######################################################
 ### Movements
 #######################################################
+# Todo Refactoring, this classes are nearly useless
 
 class Movements:
     pos =  None
@@ -168,7 +169,7 @@ class KingMovements(Movements):
 
 class ChessPiece:
     color       = None
-    pos         = False
+    pos         = None
     moved       = False
     ucOffset    = None
     ascii       = None
@@ -179,6 +180,7 @@ class ChessPiece:
     def __init__(self, color):
         self.color      = color
         self.moveIns    = []
+        self.pos        = None
         for c in self.moveClasses:
             mI = c(piece = self)
             #print(mI.__class__.__name__)
@@ -186,10 +188,9 @@ class ChessPiece:
 
     def move(self, t):
         if t in self.getPossibleMoves():
-            oldPos = self.pos
+            self.board[self.pos] = None
             self.board[t] = self
             self.moved = True
-            self.board[oldPos] = None
             self.board.pawnDoubleMove = None
             return True
         else:
@@ -218,7 +219,7 @@ class ChessPiece:
                 #print(e, Board.tN(e), self.board[e].__class__.__name__)
                 tPiece = self.board[e]
                 if tPiece != None:
-                    if tPiece.color != self.color:
+                    if tPiece.color != self.color and not isinstance(self, Pawn):
                         t.append(e)
                     break
                 t.append(e)
@@ -230,19 +231,20 @@ class ChessPiece:
         return []
 
     def __str__(self):
-        rStr = "-" + self.__class__.__name__ + "\n"
-        rStr += "  Position: " + Board.tN(self.pos) + ", Color: " + self.color + "\n"
-        rStr += "  Possible Moves: "
-        for i, group in enumerate(self.getPossibleMoves()):
-            if isinstance(group, list):
-                if i == 0:
+        rStr = "-" + self.__class__.__name__ + ", Color: " + self.color + "\n"
+        if self.pos:
+            rStr += "  Position: " + Board.tN(self.pos) + "\n"
+            rStr += "  Possible Moves: "
+            for i, group in enumerate(self.getPossibleMoves()):
+                if isinstance(group, list):
+                    if i == 0:
+                        rStr += "\n"
+                    rStr += "    - "
+                    for move in group:
+                        rStr += Board.tN(move) + " "
                     rStr += "\n"
-                rStr += "    - "
-                for move in group:
-                    rStr += Board.tN(move) + " "
-                rStr += "\n"
-            else:
-                rStr += Board.tN(group) + " "
+                else:
+                    rStr += Board.tN(group) + " "
         return rStr
 
 
@@ -254,18 +256,18 @@ class King(ChessPiece):
     def move(self, t):
         # Rochade
         if t in self.getRochadeMoves():
-            oldPos = self.pos
+            self.board[self.pos] = None
             self.board[t] = self
             self.moved = True
-            self.board[oldPos] = None
             if self.pos[0] == 1:
-                oldPos = (0, self.pos[1])
-                self.board[(2, self.pos[1])] = self.board[oldPos]
-                self.board[oldPos] = None
+                rookOldPos = (0, self.pos[1])
+                rookNewPos = (2, self.pos[1])
             else:
-                oldPos = (7, self.pos[1])
-                self.board[(4, self.pos[1])] = self.board[oldPos]
-                self.board[oldPos] = None
+                rookOldPos = (7, self.pos[1])
+                rookNewPos = (4, self.pos[1])
+            rook = self.board[rookOldPos]
+            self.board[rookOldPos] = None
+            self.board[rookNewPos] = rook
             self.board.pawnDoubleMove = None
             return True  
         else:
@@ -328,9 +330,9 @@ class Pawn(ChessPiece):
     def move(self, t):
         if t in self.getEnPassantMoves():
             oldPos = self.pos
+            self.board[self.pos] = None
             self.board[t] = self
             self.moved = True
-            self.board[oldPos] = None
             self.board[(t[0], oldPos[1])] = None
             self.board.pawnDoubleMove = None
             return True
@@ -341,6 +343,11 @@ class Pawn(ChessPiece):
                 return True
             else:
                 return False
+        elif (t[1] == 7 and self.color == C.W) or (t[1] == 0 and self.color == C.B):
+            if super().move(t):
+                self.board.pawnDoubleMove = None
+                self.board[t] = None
+                self.board[t] = Queen(self.color)
         else:
             return super().move(t)
 
@@ -386,8 +393,13 @@ class Board:
     pawnDoubleMove = None
     
     def __init__(self):
+        self.pieces = {}
+        self.pieces[C.B] = []
+        self.pieces[C.W] = []
+
         self.b = [[None for x in range(8)] for y in range(8)]
         self.pawnDoubleMove = None
+
         if Settings.ansiColors:
             self.printer = AnsiColorPrinter
         else:
@@ -422,9 +434,18 @@ class Board:
 
     def __setitem__(self, key, value):
         i = self.tI(key)
+        #print("setting field", self.tN(i), "which contains", self.b[i[1]][i[0]], "to", value)
+
+        if self.b[i[1]][i[0]] is not None:
+            self.b[i[1]][i[0]].pos = None
+            self.pieces[self.b[i[1]][i[0]].color].remove(self.b[i[1]][i[0]])
+
         if value:
+            if value.pos is None:
+                self.pieces[value.color].append(value)
             value.pos       = i
             value.board     = self
+
         self.b[i[1]][i[0]] = value
 
     def move(self, oPos, tPos):
