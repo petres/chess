@@ -31,7 +31,6 @@ class WithoutColorPrinter:
         else:
             sign = WithoutColorPrinter.getSignForPiece(cell)
 
-        print(sign)
         rStr += sign + ' |'
 
         return rStr

@@ -3,7 +3,7 @@ from printer import WithoutColorPrinter, AnsiColorPrinter
 
 import os, sys
 
-os.chdir(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 #######################################################
 ### Movements
 #######################################################

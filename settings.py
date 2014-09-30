@@ -1,6 +1,6 @@
 class Settings:
-    utf8        = True
-    ansiColors  = True
+    utf8        = False
+    ansiColors  = False
     fileName	= "board.txt"
     posFolder	= "positions"
 
