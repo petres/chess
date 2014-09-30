@@ -209,14 +209,13 @@ class ChessPiece:
             t.extend(ins.getPossibleMoves())
         return t
 
-    def getPossibleMoves(self):
+    def getPossibleMoves(self, checkTest = True):
         t = []
         for group in self.getPiecePossibleMoves():
             if len(group) == 0:
                 continue
 
             for e in group:
-                #print(e, Board.tN(e), self.board[e].__class__.__name__)
                 tPiece = self.board[e]
                 if tPiece != None:
                     if tPiece.color != self.color and not isinstance(self, Pawn):
@@ -225,13 +224,22 @@ class ChessPiece:
                 t.append(e)
 
         t.extend(self.getAddMoves())
-        return t
+
+        if not checkTest:
+            return t
+
+        r = []
+        for m in t:
+            if not self.board.isCheckAfterMove(self, m):
+                r.append(m)  
+
+        return r
 
     def getAddMoves(self):
         return []
 
     def __str__(self):
-        rStr = "-" + self.__class__.__name__ + ", Color: " + self.color + "\n"
+        rStr = "- " + self.__class__.__name__ + ", Color: " + self.color + "\n"
         if self.pos:
             rStr += "  Position: " + Board.tN(self.pos) + "\n"
             rStr += "  Possible Moves: "
@@ -255,7 +263,7 @@ class King(ChessPiece):
 
     def move(self, t):
         # Rochade
-        if t in self.getRochadeMoves():
+        if t in self.getRochadeMoves() and t in self.getPossibleMoves():
             self.board[self.pos] = None
             self.board[t] = self
             self.moved = True
@@ -328,7 +336,7 @@ class Pawn(ChessPiece):
     moveClasses = [PawnMovements]
 
     def move(self, t):
-        if t in self.getEnPassantMoves():
+        if t in self.getEnPassantMoves() and t in self.getPossibleMoves():
             oldPos = self.pos
             self.board[self.pos] = None
             self.board[t] = self
@@ -354,15 +362,12 @@ class Pawn(ChessPiece):
     def getCaptureMoves(self):
         moves = []
         i, j = self.getPos()
-
         direction = 1
         if self.getColor() == C.B:
             direction = -1
-
         if i != 0 and self.board[i - 1 , j + direction] is not None and self.board[i - 1, j + direction].getColor() != self.getColor():
             moves.append((i - 1, j + direction))
-
-        if j != 7 and self.board[i + 1 , j + direction] is not None and self.board[i + 1, j + direction].getColor() != self.getColor():
+        if i != 7 and self.board[i + 1 , j + direction] is not None and self.board[i + 1, j + direction].getColor() != self.getColor():
             moves.append((i + 1, j + direction))
 
         return moves
@@ -391,11 +396,13 @@ class Pawn(ChessPiece):
 class Board:
     b = [[None for x in range(8)] for y in range(8)]
     pawnDoubleMove = None
+
     
     def __init__(self):
         self.pieces = {}
         self.pieces[C.B] = []
         self.pieces[C.W] = []
+        self.turnOf = C.W
 
         self.b = [[None for x in range(8)] for y in range(8)]
         self.pawnDoubleMove = None
@@ -404,6 +411,7 @@ class Board:
             self.printer = AnsiColorPrinter
         else:
             self.printer = WithoutColorPrinter
+
 
     def setStartPosition(self):
         for i in range(8):
@@ -428,9 +436,11 @@ class Board:
         self['E1'] = Queen(C.W)
         self['E8'] = Queen(C.B)
 
+
     def __getitem__(self, key):
         i = self.tI(key)
         return self.b[i[1]][i[0]] 
+
 
     def __setitem__(self, key, value):
         i = self.tI(key)
@@ -448,6 +458,7 @@ class Board:
 
         self.b[i[1]][i[0]] = value
 
+
     def move(self, oPos, tPos):
         o = self.tI(oPos)
         t = self.tI(tPos)
@@ -459,6 +470,39 @@ class Board:
             oP.move(t)
         else:
             print("No piece at " + Board.tN(o))
+
+
+    def isCheck(self, color):
+        cColor = C.B
+        if color == C.B:
+            cColor = C.W
+
+        king = None
+        for piece in self.pieces[color]:
+            if isinstance(piece, King):
+                king = piece
+
+        for piece in self.pieces[cColor]:
+            #print("blup", piece.pos, piece.__class__.__name__)
+            if king.pos in piece.getPossibleMoves(checkTest = False):
+                return True
+
+        return False
+
+    def isCheckAfterMove(self, piece, t):
+        sPos = piece.pos
+        tFig = self[t]
+
+        self[sPos] = None
+        self[t] = piece
+        #print(piece.pos)
+        
+        r = self.isCheck(piece.color)
+
+        self[t] = tFig
+        self[sPos] = piece
+        return r
+        # return False
 
     @staticmethod
     def tI(key):
@@ -473,9 +517,11 @@ class Board:
             y = int(yL) - 1
             return (x, y)
 
+
     @staticmethod
     def tN(pos):
         return chr(97 + pos[0]).upper() + str(pos[1] + 1)
+
 
     def __str__(self):
         rStr = self.printer.outputColLabels(True) + "\n"
@@ -487,6 +533,7 @@ class Board:
             rStr += self.printer.outputRowLabel(j + 1) + "\n"
         rStr += self.printer.outputColLabels() + "\n"
         return rStr
+
 
     def writeFile(self, fileName = Settings.fileName):
         strRep = ""
@@ -502,6 +549,7 @@ class Board:
         
         with open(os.path.join(Settings.posFolder, fileName), 'w') as f:
             f.write(strRep)
+
 
     @staticmethod
     def readFile(fileName = Settings.fileName):
