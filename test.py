@@ -79,9 +79,9 @@ while True:
 		break
 	if len(kIn) == 2:
 		if kIn == "pw":
-			b.printPossibleMoves(b.getPossibleMoves(C.W))
+			b.printPossibleMoves(C.W)
 		elif kIn == "pb":
-			b.printPossibleMoves(b.getPossibleMoves(C.B))
+			b.printPossibleMoves(C.B)
 		else:
 			print(b[kIn])
 	if len(kIn) == 4:

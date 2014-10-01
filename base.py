@@ -20,21 +20,25 @@ class Movements:
         self.color = color
         self.piece = piece
 
+
     def getPos(self):
         if self.piece is not None:
             return self.piece.getPos()
         return self.pos
+
 
     def getColor(self):
         if self.piece is not None:
             return self.piece.getColor()
         return self.color
 
+
     def getSpec(self):
         rStr = "Position: " + Board.tN(self.getPos())
         if self.color != None:
             rStr += ", Color: " + self.getColor()
         return rStr
+
 
     def getPossibleMoves(self):
         pass
@@ -473,12 +477,15 @@ class Board:
             print("No piece at " + Board.tN(o))
         return False
 
+
     def getPossibleMoves(self, color):
         pm = {}
-        for piece in self.pieces[color]:
+        # list is changing therefore coping
+        for piece in list(self.pieces[color]):
             ppm = piece.getPossibleMoves()
             if len(ppm) > 0:
-                pm[piece] = ppm
+                pm[piece.pos] = ppm
+        print(len(pm))
         return pm
 
 
@@ -515,11 +522,11 @@ class Board:
         self[sPos] = piece
         return r
 
-    @staticmethod
-    def printPossibleMoves(pm):
+    def printPossibleMoves(self, color):
+        pm = self.getPossibleMoves(color)
         print("Possible Moves:")
         for i in pm:
-            print(i.__class__.__name__, Board.tN(i.pos), "->", end=" ")
+            print(self[i].__class__.__name__, Board.tN(i), "->", end=" ")
             for j in pm[i]:
                 print(Board.tN(j), end=" ")
             print()
