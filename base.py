@@ -402,6 +402,7 @@ class Board:
         self.pieces = {}
         self.pieces[C.B] = []
         self.pieces[C.W] = []
+
         self.turnOf = C.W
 
         self.b = [[None for x in range(8)] for y in range(8)]
@@ -467,9 +468,25 @@ class Board:
         print("Try to move:", Board.tN(o), "->",Board.tN(t))
 
         if oP:
-            oP.move(t)
+            return oP.move(t)
         else:
             print("No piece at " + Board.tN(o))
+        return False
+
+    def getPossibleMoves(self, color):
+        pm = {}
+        for piece in self.pieces[color]:
+            ppm = piece.getPossibleMoves()
+            if len(ppm) > 0:
+                pm[piece] = ppm
+        return pm
+
+
+    def isFieldThreaten(self, field, color):
+        for piece in self.pieces[color]:
+            if field in piece.getPossibleMoves(checkTest = False):
+                return True
+        return False
 
 
     def isCheck(self, color):
@@ -482,12 +499,8 @@ class Board:
             if isinstance(piece, King):
                 king = piece
 
-        for piece in self.pieces[cColor]:
-            #print("blup", piece.pos, piece.__class__.__name__)
-            if king.pos in piece.getPossibleMoves(checkTest = False):
-                return True
+        return self.isFieldThreaten(king.pos, cColor)
 
-        return False
 
     def isCheckAfterMove(self, piece, t):
         sPos = piece.pos
@@ -495,14 +508,21 @@ class Board:
 
         self[sPos] = None
         self[t] = piece
-        #print(piece.pos)
         
         r = self.isCheck(piece.color)
 
         self[t] = tFig
         self[sPos] = piece
         return r
-        # return False
+
+    @staticmethod
+    def printPossibleMoves(pm):
+        print("Possible Moves:")
+        for i in pm:
+            print(i.__class__.__name__, Board.tN(i.pos), "->", end=" ")
+            for j in pm[i]:
+                print(Board.tN(j), end=" ")
+            print()
 
     @staticmethod
     def tI(key):
@@ -575,7 +595,7 @@ class Board:
                         color = C.W
                     pieceLetter = value.upper()
 
-                    b.b[7 - i][j] = asciiToPiece[pieceLetter](color)
+                    b[(j,7-i)] = asciiToPiece[pieceLetter](color)
 
         return b
 

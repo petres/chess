@@ -69,7 +69,6 @@ while True:
 		if len(cmd) == 2:
 			fileName = cmd[1]
 
-		print(cmd[0])
 		if cmd[0] == "e":
 			print("Exporting")
 			b.writeFile(fileName)
@@ -79,7 +78,12 @@ while True:
 	if len(kIn) == 0:
 		break
 	if len(kIn) == 2:
-		print(b[kIn])
+		if kIn == "pw":
+			b.printPossibleMoves(b.getPossibleMoves(C.W))
+		elif kIn == "pb":
+			b.printPossibleMoves(b.getPossibleMoves(C.B))
+		else:
+			print(b[kIn])
 	if len(kIn) == 4:
 		b.move(kIn[:2],kIn[2:])
 
