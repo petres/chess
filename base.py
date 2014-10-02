@@ -485,7 +485,6 @@ class Board:
             ppm = piece.getPossibleMoves()
             if len(ppm) > 0:
                 pm[piece.pos] = ppm
-        print(len(pm))
         return pm
 
 
@@ -507,6 +506,10 @@ class Board:
                 king = piece
 
         return self.isFieldThreaten(king.pos, cColor)
+
+    def isCheckMate(self, color):
+        if self.isCheck() and self.getPossibleMoves(color):
+            return True;
 
 
     def isCheckAfterMove(self, piece, t):
