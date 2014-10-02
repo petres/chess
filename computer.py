@@ -18,20 +18,29 @@ b = Board()
 
 b.setStartPosition();
 
-pW = Terminal(C.W)
-pB = KillBill(C.B)
+pW = KillBill(C.W)
+pB = KillBest(C.B)
 
 print(b)
 
 while True:
 	for p in [pW, pB]:
+		status = b.getStatus(p.color);
+		if status != GameStatus.NotFinished:
+			if status == GameStatus.StaleMate:
+				print("Stale Mate for " + p.color.name)
+			else:
+				print("Check Mate for " + p.color.name)
+			print(b)
+			exit();
+
 		while True:
 			piecePos, toPos = p.move(b)
 			if b.move(piecePos, toPos):
 				break
 
 		print(b)
-		time.sleep(0.5)
+		time.sleep(0.7)
 
 	
 

@@ -5,5 +5,13 @@ class Settings:
     posFolder	= "positions"
 
 class C:
-    W = "White"
-    B = "Black"
+    class W:
+    	name 		= "White"
+    	direction 	= 1
+    class B:
+    	name 		= "Black"
+    	direction 	= -1
+
+
+C.W.O = C.B
+C.B.O = C.W

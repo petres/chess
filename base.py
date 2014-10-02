@@ -213,7 +213,7 @@ class ChessPiece:
             t.extend(ins.getPossibleMoves())
         return t
 
-    def getPossibleMoves(self, checkTest = True):
+    def getPossibleMoves(self, checkTest = True, forCapture = False):
         t = []
         for group in self.getPiecePossibleMoves():
             if len(group) == 0:
@@ -227,7 +227,7 @@ class ChessPiece:
                     break
                 t.append(e)
 
-        t.extend(self.getAddMoves())
+        t.extend(self.getAddMoves(forCapture))
 
         if not checkTest:
             return t
@@ -239,7 +239,7 @@ class ChessPiece:
 
         return r
 
-    def getAddMoves(self):
+    def getAddMoves(self, forCapture = False):
         return []
 
     def __str__(self):
@@ -302,6 +302,17 @@ class King(ChessPiece):
                         if self.board[(ii, self.pos[1])] is not None:
                             possible = False
                             break
+
+                    if possible:
+                        if self.board.isFieldThreaten(self.pos, self.getColor().O) is not None:
+                            possible = False
+
+                    if possible:
+                        for ii in between:
+                            if self.board.isFieldThreaten(ii, self.getColor().O) is not None:
+                                possible = False
+                                break
+
                     # TODO CHECK CHECK!
                     if possible:
                         if i == 0:
@@ -311,7 +322,9 @@ class King(ChessPiece):
                         moves.append(move)
         return moves
 
-    def getAddMoves(self):
+    def getAddMoves(self, forCapture = False):
+        if forCapture:
+            return []
         return self.getRochadeMoves()
 
 class Queen(ChessPiece):
@@ -360,6 +373,9 @@ class Pawn(ChessPiece):
                 self.board.pawnDoubleMove = None
                 self.board[t] = None
                 self.board[t] = Queen(self.color)
+                return True
+            else:
+                return False
         else:
             return super().move(t)
 
@@ -387,10 +403,17 @@ class Pawn(ChessPiece):
 
         return []
 
-    def getAddMoves(self):
+    def getAddMoves(self, forCapture = False):
         return self.getCaptureMoves() + self.getEnPassantMoves()
 
 #######################################################
+
+
+class GameStatus:
+    NotFinished = 0
+    CheckMate   = 1
+    StaleMate   = 2
+
 
 
 #######################################################
@@ -490,9 +513,19 @@ class Board:
 
     def isFieldThreaten(self, field, color):
         for piece in self.pieces[color]:
-            if field in piece.getPossibleMoves(checkTest = False):
+            if field in piece.getPossibleMoves(checkTest = False, forCapture = True):
                 return True
         return False
+
+
+    def getStatus(self, color):
+        if len(self.getPossibleMoves(color)) == 0:
+            if self.isCheck(color):
+                return GameStatus.CheckMate
+            else:
+                return GameStatus.StaleMate
+        else:
+            return GameStatus.NotFinished
 
 
     def isCheck(self, color):
@@ -506,10 +539,6 @@ class Board:
                 king = piece
 
         return self.isFieldThreaten(king.pos, cColor)
-
-    def isCheckMate(self, color):
-        if self.isCheck() and self.getPossibleMoves(color):
-            return True;
 
 
     def isCheckAfterMove(self, piece, t):
