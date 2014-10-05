@@ -18,8 +18,8 @@ b = Board()
 
 b.setStartPosition();
 
-pW = KillBill(C.W)
-pB = KillBest(C.B)
+pW = KillBest(C.W)
+pB = KillBill(C.B)
 
 print(b)
 
@@ -38,9 +38,8 @@ while True:
 			piecePos, toPos = p.move(b)
 			if b.move(piecePos, toPos):
 				break
-
-		print(b)
-		time.sleep(0.7)
+		b.writeFile("last")
+		#print(b)
 
 	
 

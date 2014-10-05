@@ -9,10 +9,12 @@ class C:
         name        = "White"
         direction   = 1
         pawnStart   = 1
+        pawnLast    = 7
     class B:
         name        = "Black"
         direction   = -1
         pawnStart   = 6
+        pawnLast    = 0
 
 
 C.W.O = C.B

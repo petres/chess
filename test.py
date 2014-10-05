@@ -83,7 +83,7 @@ while True:
 		elif kIn == "pb":
 			b.printPossibleMoves(C.B)
 		else:
-			print(b[kIn])
+			b.printFieldInfo(kIn)
 	if len(kIn) == 4:
 		b.move(kIn[:2],kIn[2:])
 
