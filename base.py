@@ -653,7 +653,7 @@ class Board:
         for j in range(8)[::-1]:
             for i in range(8):
                 piece = self[i,j]
-                s = " "
+                s = "-"
                 if piece:
                     s = printer.getSignForPiece(piece, False)
                 strRep += s
@@ -681,12 +681,11 @@ class Board:
         for i in range(8):
             for j in range(8):
                 value = content[j + i*(8+1)]
-                if value != " ":
+                if value != " " and value != "-":
                     color = C.B
                     if value.isupper():
                         color = C.W
                     pieceLetter = value.upper()
-
                     b[j,7-i] = asciiToPiece[pieceLetter](color)
 
         b.analyse()
