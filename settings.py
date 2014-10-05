@@ -6,11 +6,13 @@ class Settings:
 
 class C:
     class W:
-    	name 		= "White"
-    	direction 	= 1
+        name        = "White"
+        direction   = 1
+        pawnStart   = 1
     class B:
-    	name 		= "Black"
-    	direction 	= -1
+        name        = "Black"
+        direction   = -1
+        pawnStart   = 6
 
 
 C.W.O = C.B

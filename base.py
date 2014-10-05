@@ -124,11 +124,8 @@ class PawnMovements(Movements):
         if self.getColor() is None:
             raise Exception("Pawn Movements need a color")
 
-        start = 1
-        direction = 1
-        if self.getColor() == C.B:
-            start = 6
-            direction = -1
+        start = self.getColor().pawnStart
+        direction = self.getColor().direction
 
         moves = []
         moves.append((i, j + direction))
@@ -216,9 +213,6 @@ class ChessPiece:
     def getPossibleMoves(self, checkTest = True, forCapture = False):
         t = []
         for group in self.getPiecePossibleMoves():
-            if len(group) == 0:
-                continue
-
             for e in group:
                 tPiece = self.board[e]
                 if tPiece != None:
@@ -243,7 +237,7 @@ class ChessPiece:
         return []
 
     def __str__(self):
-        rStr = "- " + self.__class__.__name__ + ", Color: " + self.color + "\n"
+        rStr = "- " + self.__class__.__name__ + ", Color: " + self.color.name + "\n"
         if self.pos:
             rStr += "  Position: " + Board.tN(self.pos) + "\n"
             rStr += "  Possible Moves: "
@@ -258,6 +252,7 @@ class ChessPiece:
                 else:
                     rStr += Board.tN(group) + " "
         return rStr
+
 
 
 class King(ChessPiece):
@@ -382,11 +377,11 @@ class Pawn(ChessPiece):
     def getCaptureMoves(self):
         moves = []
         i, j = self.getPos()
-        direction = 1
-        if self.getColor() == C.B:
-            direction = -1
+        direction = self.getColor().direction
+
         if i != 0 and self.board[i - 1 , j + direction] is not None and self.board[i - 1, j + direction].getColor() != self.getColor():
             moves.append((i - 1, j + direction))
+        
         if i != 7 and self.board[i + 1 , j + direction] is not None and self.board[i + 1, j + direction].getColor() != self.getColor():
             moves.append((i + 1, j + direction))
 
@@ -396,9 +391,7 @@ class Pawn(ChessPiece):
         if self.board.pawnDoubleMove is not None:
             i, j = self.getPos()
             if j == self.board.pawnDoubleMove[1] and abs(i - self.board.pawnDoubleMove[0]) == 1 and self.board[self.board.pawnDoubleMove].getColor() != self.getColor(): 
-                direction = 1
-                if self.getColor() == C.B:
-                    direction = -1
+                direction = self.getColor().direction
                 return [(self.board.pawnDoubleMove[0], self.board.pawnDoubleMove[1] + direction)]
 
         return []
@@ -421,10 +414,6 @@ class GameStatus:
 #######################################################
 
 class Board:
-    b = [[None for x in range(8)] for y in range(8)]
-    pawnDoubleMove = None
-
-    
     def __init__(self):
         self.pieces = {}
         self.pieces[C.B] = []
@@ -432,7 +421,7 @@ class Board:
 
         self.turnOf = C.W
 
-        self.b = [[None for x in range(8)] for y in range(8)]
+        self.b = [[{'p': None, 't': {C.B: [], C.W:[]}} for x in range(8)] for y in range(8)]
         self.pawnDoubleMove = None
 
         if Settings.ansiColors:
@@ -466,25 +455,25 @@ class Board:
 
 
     def __getitem__(self, key):
-        i = self.tI(key)
-        return self.b[i[1]][i[0]] 
+        i, j = self.tI(key)
+        return self.b[j][i]['p']
 
 
-    def __setitem__(self, key, value):
-        i = self.tI(key)
-        #print("setting field", self.tN(i), "which contains", self.b[i[1]][i[0]], "to", value)
+    def __setitem__(self, key, piece):
+        i, j = self.tI(key)
+        cPiece = self[i,j]
 
-        if self.b[i[1]][i[0]] is not None:
-            self.b[i[1]][i[0]].pos = None
-            self.pieces[self.b[i[1]][i[0]].color].remove(self.b[i[1]][i[0]])
+        if cPiece is not None:
+            cPiece.pos = None
+            self.pieces[cPiece.color].remove(cPiece)
 
-        if value:
-            if value.pos is None:
-                self.pieces[value.color].append(value)
-            value.pos       = i
-            value.board     = self
+        if piece:
+            if piece.pos is None:
+                self.pieces[piece.color].append(piece)
+            piece.pos       = (i, j)
+            piece.board     = self
 
-        self.b[i[1]][i[0]] = value
+        self.b[j][i]['p'] = piece
 
 
     def move(self, oPos, tPos):
@@ -498,6 +487,7 @@ class Board:
             return oP.move(t)
         else:
             print("No piece at " + Board.tN(o))
+
         return False
 
 
@@ -587,7 +577,7 @@ class Board:
         for j in range(8)[::-1]:
             rStr += self.printer.outputRowLabel(j + 1, True) 
             for i in range(8):
-                cell = self.b[j][i]
+                cell = self[i,j]
                 rStr += self.printer.outputCell(cell, (i+j)%2 == 1)
             rStr += self.printer.outputRowLabel(j + 1) + "\n"
         rStr += self.printer.outputColLabels() + "\n"
