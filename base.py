@@ -276,12 +276,12 @@ class King(ChessPiece):
             self.board[self.pos] = None
             self.board[t] = self
             self.moved = True
-            if self.pos[0] == 1:
+            if self.pos[0] == 2:
                 rookOldPos = (0, self.pos[1])
-                rookNewPos = (2, self.pos[1])
+                rookNewPos = (3, self.pos[1])
             else:
                 rookOldPos = (7, self.pos[1])
-                rookNewPos = (4, self.pos[1])
+                rookNewPos = (5, self.pos[1])
             rook = self.board[rookOldPos]
             self.board[rookOldPos] = None
             self.board[rookNewPos] = rook
@@ -299,9 +299,9 @@ class King(ChessPiece):
                 if isinstance(mP, Rook) and mP.getColor() == self.color and mP.moved == False:
                     between = []
                     if i == 0:
-                        between = range(1, 3)
+                        between = range(1, 4)
                     else:
-                        between = range(4, 7)
+                        between = range(5, 7)
                     
                     possible = True
                     for ii in between:
@@ -321,9 +321,9 @@ class King(ChessPiece):
 
                     if possible:
                         if i == 0:
-                            move = (1, self.pos[1])
+                            move = (2, self.pos[1])
                         else:
-                            move = (5, self.pos[1])
+                            move = (6, self.pos[1])
                         moves.append(move)
         return moves
 
