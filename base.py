@@ -479,11 +479,11 @@ class Board:
             self[(i, 0)] = Bishop(C.W)
             self[(i, 7)] = Bishop(C.B)
 
-        self['D1'] = King(C.W)
-        self['D8'] = King(C.B)
+        self['E1'] = King(C.W)
+        self['E8'] = King(C.B)
 
-        self['E1'] = Queen(C.W)
-        self['E8'] = Queen(C.B)
+        self['D1'] = Queen(C.W)
+        self['D8'] = Queen(C.B)
 
         self.analyse()
 
@@ -642,7 +642,7 @@ class Board:
             rStr += self.printer.outputRowLabel(j + 1, True) 
             for i in range(8):
                 cell = self[i,j]
-                rStr += self.printer.outputCell(cell, (i+j)%2 == 1)
+                rStr += self.printer.outputCell(cell, (i+j)%2 == 0)
             rStr += self.printer.outputRowLabel(j + 1) + "\n"
         rStr += self.printer.outputColLabels() + "\n"
         return rStr
