@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
         <title>Chess</title>
         {% endblock %}
     </head>
@@ -93,7 +94,10 @@
                     <td id="H1"></td>
                 </tr>
             </table>
-            <button onClick="restart()">restart</button>
+            <div id="statusRow">
+                <div id="status"></div>
+                <button onClick="restart()">restart</button>
+            </div>
             {% endblock %}
         </div>
     </body>

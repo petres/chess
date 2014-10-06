@@ -55,7 +55,11 @@ def move(origin, target):
 def _getBoardInfo():
 	info = {	'turnOf': 			b.turnOf.name.lower(),
 			 	'check':			b.isCheck(b.turnOf),
-			 	'over':				len(b.getPossibleMoves(b.turnOf)) == 0}
+			 	'over':				len(b.getPossibleMoves(b.turnOf)) == 0 }
+	
+	if len(b.history) > 0:
+		info['lastMove'] = list(map(b.tN, b.history[-1]))
+
 	info['board'] = {}
 	for i in range(8):
 		for j in range(8):

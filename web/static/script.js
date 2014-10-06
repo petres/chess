@@ -2,7 +2,7 @@ var possibleMoves = {};
 
 function boardUpdate(data) {
 	possibleMoves = {}
-	$.each( data['board'], function(id, val) {
+	$.each(data['board'], function(id, val) {
 		if(val) {
 			$("#chessBoard td#" + id).html("<span class='cp " + val.color + " " + val.piece + "'></span>")
 			possibleMoves[id] = val.possibleMoves
@@ -10,23 +10,40 @@ function boardUpdate(data) {
 			$("#chessBoard td#" + id).html("")
 		}
 	});
+	$("#chessBoard td").removeClass("lastMove")
+	$.each(data['lastMove'], function(id, val) {
+		$("#chessBoard td#" + val).addClass("lastMove")
+	});
+	var statusMessage = "Turn of " + data['turnOf'] + "."
+	if(data['over']) {
+		statusMessage = "Game is over!"
+		if(data['check']) 
+	 		statusMessage += " Check Mate,  " + data['turnOf'] + " lost!"
+	 	else
+	 		statusMessage += " Stale Mate!"
+	} else if(data['check']) {
+		statusMessage = "Check! " + statusMessage;
+	}
+	$("#status").html(statusMessage)
 }
 
 function restart() {
-	$.getJSON( "/restart", function(data) {
+	$.getJSON("/restart", function(data) {
 		boardUpdate(data)
 	});
 }
 
 function move(origin, target) {
-	$.getJSON( "/move/" + origin + "/" + target, function(data) {
+	$.getJSON("/move/" + origin + "/" + target, function(data) {
 		boardUpdate(data)
 	});
 }
 
 var first = null
 $( function() {
-	restart()
+	$.getJSON("/getBoardInfo", function(data) {
+		boardUpdate(data)
+	});
 	$("#chessBoard td").click( function() {
 		if(!first) {
 			var id = $(this).attr("id")

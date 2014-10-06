@@ -1,12 +1,14 @@
 .cp {
 	color:#000;
 	display:block;
+	margin-top: 2px;
 	font-size:50px;
-	height:60px;
+	height:58px;
 	position:relative;
 	text-decoration:none;
 	text-shadow:0 1px #fff;
 	width:60px;
+	line-height: 1em;
 }
 #chessBoard { border:5px solid #333; }
 #chessBoard td {
@@ -39,7 +41,29 @@
 	box-shadow:inset 0 0 10px rgba(255,149,36,0.8);
 }
 
+#chessBoard td.lastMove,
+#chessBoard tr:nth-child(odd) td.lastMove:nth-child(even),
+#chessBoard tr:nth-child(even) td.lastMove:nth-child(odd) {
+	box-shadow:inset 0 0 10px rgba(0,0,255,0.8);
+}
 
+#status {
+	font-size: 1.2em;
+}
+
+#statusRow {
+	margin: 5px auto;
+	text-align: center;
+}
+
+#content {
+	margin: 10px auto;
+	width: 500px;
+}
+
+body {
+	font-family: 'Oswald', sans-serif;
+}
 
 .cp.king.white:before   { content: "\2654" }
 .cp.queen.white:before  { content: "\2655" }

@@ -451,6 +451,7 @@ class Board:
         self.king[C.B] = None
         self.king[C.W] = None
 
+        self.history = []
         self.turnOf = C.W
 
         self.b = [[{'p': None, 't': {C.B: [], C.W:[]}} for x in range(8)] for y in range(8)]
@@ -535,6 +536,7 @@ class Board:
 
         if oP:
             if oP.color == self.turnOf and oP.move(t):
+                self.history.append((o, t))
                 self.turnOf = self.turnOf.O
                 self.analyse()
                 return True
