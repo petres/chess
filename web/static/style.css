@@ -1,28 +1,28 @@
-a {
+.cp {
 	color:#000;
 	display:block;
-	font-size:60px;
-	height:80px;
+	font-size:50px;
+	height:60px;
 	position:relative;
 	text-decoration:none;
 	text-shadow:0 1px #fff;
-	width:80px;
+	width:60px;
 }
-#chess_board { border:5px solid #333; }
-#chess_board td {
+#chessBoard { border:5px solid #333; }
+#chessBoard td {
 	background:#fff;
 	background:-moz-linear-gradient(top, #fff, #eee);
 	background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
 	box-shadow:inset 0 0 0 1px #fff;
 	-moz-box-shadow:inset 0 0 0 1px #fff;
 	-webkit-box-shadow:inset 0 0 0 1px #fff;
-	height:80px;
+	height:60px;
 	text-align:center;
 	vertical-align:middle;
-	width:80px;
+	width:60px;
 }
-#chess_board tr:nth-child(odd) td:nth-child(even),
-#chess_board tr:nth-child(even) td:nth-child(odd) {
+#chessBoard tr:nth-child(odd) td:nth-child(even),
+#chessBoard tr:nth-child(even) td:nth-child(odd) {
 	background:#ccc;
 	background:-moz-linear-gradient(top, #aaa, #ccc);
 	background:-webkit-gradient(linear,0 0, 0 100%, from(#aaa), to(#ccc));
@@ -30,6 +30,22 @@ a {
 	-moz-box-shadow:inset 0 0 10px rgba(0,0,0,.4);
 	-webkit-box-shadow:inset 0 0 10px rgba(0,0,0,.4);
 }
+
+#chessBoard td.marked,
+#chessBoard tr:nth-child(odd) td.marked:nth-child(even),
+#chessBoard tr:nth-child(even) td.marked:nth-child(odd) {
+	background:-moz-linear-gradient(top, #a66, #c66);
+	background:-webkit-gradient(linear,0 0, 0 100%, from(#a66), to(#c66));
+}
+
+#chessBoard td.possibleTargetField,
+#chessBoard tr:nth-child(odd) td.possibleTargetField:nth-child(even),
+#chessBoard tr:nth-child(even) td.possibleTargetField:nth-child(odd) {
+	background:-moz-linear-gradient(top, #a06, #c06);
+	background:-webkit-gradient(linear,0 0, 0 100%, from(#a06), to(#c06));
+}
+
+
 
 .cp.king.white:before   { content: "\2654" }
 .cp.queen.white:before  { content: "\2655" }
