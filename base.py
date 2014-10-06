@@ -534,7 +534,8 @@ class Board:
         print("Try to move:", Board.tN(o), "->",Board.tN(t))
 
         if oP:
-            if oP.move(t):
+            if oP.color == self.turnOf and oP.move(t):
+                self.turnOf = self.turnOf.O
                 self.analyse()
                 return True
         else:

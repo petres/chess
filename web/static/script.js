@@ -2,7 +2,7 @@ var possibleMoves = {};
 
 function boardUpdate(data) {
 	possibleMoves = {}
-	$.each( data, function(id, val) {
+	$.each( data['board'], function(id, val) {
 		if(val) {
 			$("#chessBoard td#" + id).html("<span class='cp " + val.color + " " + val.piece + "'></span>")
 			possibleMoves[id] = val.possibleMoves
@@ -12,8 +12,8 @@ function boardUpdate(data) {
 	});
 }
 
-function init() {
-	$.getJSON( "/getBoardInfo", function(data) {
+function restart() {
+	$.getJSON( "/restart", function(data) {
 		boardUpdate(data)
 	});
 }
@@ -26,7 +26,7 @@ function move(origin, target) {
 
 var first = null
 $( function() {
-	init()
+	restart()
 	$("#chessBoard td").click( function() {
 		if(!first) {
 			var id = $(this).attr("id")
