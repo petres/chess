@@ -97,6 +97,11 @@
             <div id="statusRow">
                 <div id="status"></div>
                 <button onClick="restart()">restart</button>
+                <select id="ki" name="ki">
+                {% for ki in kis %}
+                    <option {% if ki == kiSelected %}selected{% endif %}>{{ ki }}</option>
+                {% endfor %}
+                </select>
             </div>
             {% endblock %}
         </div>

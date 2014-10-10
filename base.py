@@ -244,6 +244,11 @@ class ChessPiece:
     def getAddMoves(self):
         return []
 
+    def getType(self):
+        return self.__class__
+
+    def getTypeAsString(self):
+        return self.__class__.__name__
 
     def __str__(self):
         rStr = "- " + self.__class__.__name__ + ", Color: " + self.color.name + "\n"
@@ -594,6 +599,10 @@ class Board:
 
 
     def isCheckAfterMove(self, piece, t, color = None):
+
+        # RECODE THIS
+        # KING MOVE EASY
+        # ONLY CONSIDER ...
         if color is None:
             color = piece.color
 

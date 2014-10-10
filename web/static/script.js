@@ -62,4 +62,11 @@ $( function() {
 			first = null
 		}
 	});
+
+	$("#ki").change(function () {
+		$.getJSON("/changeKI/" + $(this).val(), function(data) {
+			if(data)
+				alert("KI changed")
+		});
+	});
 })

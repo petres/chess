@@ -26,7 +26,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def base():
-	return render_template('base.html')
+	return render_template('base.html', kis = getKiClasses(), kiSelected = p.__class__.__name__)
 
 @app.route('/getBoardInfo')
 def getBoardInfo():
@@ -38,6 +38,13 @@ def restart():
 	b = Board()
 	b.setStartPosition();
 	return _getBoardInfo()
+
+@app.route('/changeKI/<ki>')
+def changeKi(ki):
+	global p
+	p = getKiClasses()[ki](C.B)
+	return sj.dumps(True)
+
 
 @app.route('/move/<origin>/<target>')
 def move(origin, target):
