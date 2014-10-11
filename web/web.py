@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 from flask import Flask
 from flask import render_template
+
 import sys, os
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "player"))
 
@@ -10,27 +12,28 @@ from settings import *
 
 from ki import *
 
-
 import simplejson as sj
 
 
-from base import *
+
 
 b = Board()
 b.setStartPosition();
 
-p = KillBest(C.B)
-
+p = FirstStep(C.B)
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def base():
-	return render_template('base.html', kis = getKiClasses(), kiSelected = p.__class__.__name__)
+	return render_template('base.html', kis = KiPlayer.getPromotedKiPlayers(), kiSelected = p.__class__.__name__)
+
 
 @app.route('/getBoardInfo')
 def getBoardInfo():
 	return _getBoardInfo()
+
 
 @app.route('/restart')
 def restart():
@@ -39,10 +42,11 @@ def restart():
 	b.setStartPosition();
 	return _getBoardInfo()
 
+
 @app.route('/changeKI/<ki>')
 def changeKi(ki):
 	global p
-	p = getKiClasses()[ki](C.B)
+	p =  KiPlayer.getPromotedKiPlayers()[ki](C.B)
 	return sj.dumps(True)
 
 
@@ -50,7 +54,12 @@ def changeKi(ki):
 def move(origin, target):
 	# HUMAN MOVE
 	b.move(origin, target)
+	return _getBoardInfo()
 
+
+@app.route('/wait')
+def wait():
+	# COMPUTER MOVE
 	if b.getStatus(b.turnOf) == GameStatus.NotFinished:
 		# COMPUER
 		piecePos, toPos = p.move(b)

@@ -2,6 +2,7 @@
 <html>
     <head>
         {% block head %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
@@ -96,12 +97,15 @@
             </table>
             <div id="statusRow">
                 <div id="status"></div>
-                <button onClick="restart()">restart</button>
-                <select id="ki" name="ki">
-                {% for ki in kis %}
-                    <option {% if ki == kiSelected %}selected{% endif %}>{{ ki }}</option>
-                {% endfor %}
-                </select>
+                <div id="ui">
+                    <button onClick="restart()">restart</button>
+                    <label for="ki">KI:</label>
+                    <select id="ki" name="ki">
+                    {% for ki in kis %}
+                        <option {% if ki == kiSelected %}selected{% endif %}>{{ ki }}</option>
+                    {% endfor %}
+                    </select>
+                </div>
             </div>
             {% endblock %}
         </div>

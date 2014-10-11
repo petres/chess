@@ -440,7 +440,14 @@ class GameStatus:
     CheckMate   = 1
     StaleMate   = 2
 
-
+asciiToPiece = {
+    "P": Pawn,
+    "R": Rook,
+    "K": King,
+    "N": Knight,
+    "B": Bishop,
+    "Q": Queen
+}
 
 #######################################################
 ### Board
@@ -537,7 +544,7 @@ class Board:
         t = self.tI(tPos)
         
         oP = self[o]
-        print("Try to move:", Board.tN(o), "->",Board.tN(t))
+        #print("Try to move:", Board.tN(o), "->",Board.tN(t))
 
         if oP:
             if oP.color == self.turnOf and oP.move(t):
@@ -599,7 +606,7 @@ class Board:
 
 
     def isCheckAfterMove(self, piece, t, color = None):
-
+        # FASTEN UP
         # RECODE THIS
         # KING MOVE EASY
         # ONLY CONSIDER ...
@@ -659,6 +666,34 @@ class Board:
         return rStr
 
 
+    def getCodedPosition(self):
+        coded = {   'pawnDoubleMove': self.pawnDoubleMove,
+                    'turnOf':         self.turnOf,
+                    'positions':      {} }
+
+        for c in self.pieces:
+            for p in self.pieces[c]:
+                coded['positions'][tuple(p.pos)] = (p.ascii, c.ascii) 
+        return coded
+
+
+    def loadCodedPosition(self, coded):
+        self.pieces[C.W] = []
+        self.pieces[C.B] = []
+
+        self.b = [[{'p': None, 't': {C.B: [], C.W:[]}} for x in range(8)] for y in range(8)]
+
+        self.pawnDoubleMove = coded['pawnDoubleMove']
+        self.turnOf = coded['turnOf']
+
+        for entry in coded['positions']:
+            i, j = entry
+            p, c = coded['positions'][entry]
+            self[i, j] = asciiToPiece[p](C.getFromSign(c))
+
+        self.analyse()
+            
+
     def writeFile(self, fileName = Settings.fileName):
         strRep = ""
         printer = WithoutColorPrinter
@@ -680,15 +715,6 @@ class Board:
         b = Board()
         with open(os.path.join(Settings.posFolder, fileName), 'r') as f:
             content = f.read()
-
-        asciiToPiece = {
-            "P": Pawn,
-            "R": Rook,
-            "K": King,
-            "N": Knight,
-            "B": Bishop,
-            "Q": Queen
-        }
 
         for i in range(8):
             for j in range(8):

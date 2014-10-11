@@ -11,9 +11,11 @@ function boardUpdate(data) {
 		}
 	});
 	$("#chessBoard td").removeClass("lastMove")
-	$.each(data['lastMove'], function(id, val) {
-		$("#chessBoard td#" + val).addClass("lastMove")
-	});
+	if(data['lastMove']) {
+		$.each(data['lastMove'], function(id, val) {
+			$("#chessBoard td#" + val).addClass("lastMove")
+		});
+	}
 	var statusMessage = "Turn of " + data['turnOf'] + "."
 	if(data['over']) {
 		statusMessage = "Game is over!"
@@ -36,7 +38,13 @@ function restart() {
 function move(origin, target) {
 	$.getJSON("/move/" + origin + "/" + target, function(data) {
 		boardUpdate(data)
+		if(!data['over']) {
+			$.getJSON("/wait", function(data) {
+				boardUpdate(data)
+			});
+		}
 	});
+
 }
 
 var first = null
@@ -65,8 +73,9 @@ $( function() {
 
 	$("#ki").change(function () {
 		$.getJSON("/changeKI/" + $(this).val(), function(data) {
-			if(data)
-				alert("KI changed")
+			if(data) {
+				//alert("KI changed")
+			}
 		});
 	});
 })

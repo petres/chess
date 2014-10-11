@@ -29,6 +29,13 @@
 	box-shadow:inset 0 0 10px rgba(0,0,0,.4);
 }
 
+#chessBoard td.lastMove,
+#chessBoard tr:nth-child(odd) td.lastMove:nth-child(even),
+#chessBoard tr:nth-child(even) td.lastMove:nth-child(odd) {
+	box-shadow:inset 0 0 10px rgba(0,0,255,0.8);
+}
+
+
 #chessBoard td.marked,
 #chessBoard tr:nth-child(odd) td.marked:nth-child(even),
 #chessBoard tr:nth-child(even) td.marked:nth-child(odd) {
@@ -40,15 +47,9 @@
 #chessBoard tr:nth-child(even) td.possibleTargetField:nth-child(odd) {
 	box-shadow:inset 0 0 10px rgba(255,149,36,0.8);
 }
-
-#chessBoard td.lastMove,
-#chessBoard tr:nth-child(odd) td.lastMove:nth-child(even),
-#chessBoard tr:nth-child(even) td.lastMove:nth-child(odd) {
-	box-shadow:inset 0 0 10px rgba(0,0,255,0.8);
-}
-
 #status {
 	font-size: 1.2em;
+	margin: 10px;
 }
 
 #statusRow {
@@ -61,8 +62,23 @@
 	width: 500px;
 }
 
+#ui {
+	line-height: 30px;
+}
+
 body {
 	font-family: 'Oswald', sans-serif;
+}
+
+label {
+	display: inline-block;
+	height: 30px;
+}
+
+button, select {
+	display: inline-block;
+	margin-right: 10px;
+	height: 30px;
 }
 
 .cp.king.white:before   { content: "\2654" }
