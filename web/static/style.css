@@ -47,6 +47,13 @@
 #chessBoard tr:nth-child(even) td.possibleTargetField:nth-child(odd) {
 	box-shadow:inset 0 0 10px rgba(255,149,36,0.8);
 }
+
+#chessBoard td.possibleTargetField,
+#chessBoard span.cp {
+	cursor:pointer;
+}
+
+
 #status {
 	font-size: 1.2em;
 	margin: 10px;
