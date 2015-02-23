@@ -1,13 +1,18 @@
-chess
-=====
+## Chess Engine
 
-A simple chess engine written in python3. You can play on the terminal or on a web interface (online: http://chess.pre.wiwiwi.at). 
+A simple chess engine written in python3. You can play on the terminal or on a [web interface](http://chess.pre.wiwiwi.at). The chess engine is quite complete. Still missing are: Fifty-move rule and the threefold repetition. 
+
+### Web Interface
 
 The web interface has two dependecies: 
-* [flask](http://flask.pocoo.org/) | microframework, webserver
+* [flask](http://flask.pocoo.org/) | Micro web framework, used also as webserver
 * [simplejson](http://simplejson.readthedocs.org/) | Writing/Reading JSON
 
-Till now three different KIs are implemented:
+Calling `web/web.py` starts the webserver with the chess engine on port 5000.
+
+## AI 
+
+Till now three different AIs are implemented (https://github.com/petres/chess/blob/master/player/ki.py):
 * **PureRandom**
 
   The simplest one. Does randomly draw a move from all possible moves.
