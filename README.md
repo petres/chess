@@ -1,6 +1,6 @@
 ## Chess Engine
 
-A simple chess engine written in python3. You can play on the terminal or on a [web interface](http://chess.pre.wiwiwi.at). The chess engine is quite complete. Still missing are: Fifty-move rule and the threefold repetition. 
+A simple chess engine written in python3. You can play on the terminal or on a [web interface](http://chess.abteil.org/). The chess engine is quite complete. Still missing are: Fifty-move rule and the threefold repetition. 
 
 ### Web Interface
 
